@@ -67,6 +67,8 @@ class SServer extends Thread {
     }
 
     class client extends Thread {
+        
+
 
         public client(Socket clientSocket, BufferedReader input, BufferedWriter output) {
             this.clientSocket = clientSocket;
@@ -103,6 +105,22 @@ class SServer extends Thread {
                         //String line;
                         int nrLen;
                         nrLen = input.read(buf);
+                        if(nrLen == -1)
+                        {
+                    try
+                        
+                    { 
+                        this.clientSocket.close();
+                        clientList.remove(this);
+                        System.out.printf("Length %d", clientList.size());
+                        return;
+                      
+                    }
+                    catch (Exception e1)
+                    {
+                        System.out.println(e1);
+                    }
+                        }
                         System.out.printf("%d\n", nrLen);
                         byte[] bt = new byte[nrLen];
                         for (int i = 0; i < nrLen; i++) {
@@ -133,6 +151,18 @@ class SServer extends Thread {
                     }
                 } catch (IOException e) {
                     System.out.println(e);
+                    try
+                        
+                    { 
+                        this.clientSocket.close();
+                        clientList.remove(this.clientSocket);
+                        System.out.printf("Length %d", clientList.size());
+                      
+                    }
+                    catch (Exception e1)
+                    {
+                        System.out.println(e1);
+                    }
                 }
             }
         }
@@ -165,6 +195,7 @@ class SServer extends Thread {
                         ct.getInetAddress().toString(), ct.getLocalPort());
                 if (ct.isConnected()) {
                     try {
+                        
                         if (connect.output != null) {
                             connect.output.close();
                         }
@@ -177,6 +208,7 @@ class SServer extends Thread {
 
                     //System.out.println("dddddddddddddddddd");
                     ct.close();
+                    MonitorList.remove(i);
                 }
             } catch (IOException e) {
                 System.out.println(e);
@@ -201,10 +233,11 @@ class SServer extends Thread {
                     String str = String.format("%d:L %s  R %s %04d\n", i++, clientSocket.getLocalAddress().toString(),
                             clientSocket.getInetAddress().toString(), clientSocket.getLocalPort());
                     System.out.printf(str);
-                    log(str);
+                    
                     c = new client(clientSocket, input, output);
                     clientList.add(c);
                     c.start();
+                    log(str);
                 }
             } catch (IOException e) {
                 //System.out.println("from");
